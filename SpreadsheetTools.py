@@ -1,33 +1,102 @@
 
 from openpyxl import Workbook
+from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl.worksheet.table import Table, TableStyleInfo
+from openpyxl import load_workbook
 
 
-wb = Workbook()
-ws = wb.active
+xlscols = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+for i in range(26):
+    for j in range(26):
+        xlscols.append(xlscols[i] + xlscols[j])
 
-data = [
-    ['Apples', 10000, 5000, 8000, 6000],
-    ['Pears',   2000, 3000, 4000, 5000],
-    ['Bananas', 6000, 6000, 6500, 6000],
-    ['Oranges',  500,  300,  200,  700],
-]
 
-# add column headings. NB. these must be strings
-ws.append(["Fruit", "2011", "2012", "2013", "2014"])
-for row in data:
-    ws.append(row)
+def delete_table(workbook: Workbook, table_name: str) -> Worksheet:
+    for ws in workbook.worksheets:
+        for table in ws.tables.values():
+            if table.name == table_name:
+                for row in ws[table.ref]:
+                    for cell in row:
+                        cell.value = None
+                del ws.tables[table_name]
+                return ws
+    return None
 
-tab = Table(displayName="Table1", ref="A1:E5")
 
-# Add a default style with striped rows and banded columns
-style = TableStyleInfo(name="TableStyleMedium9", showFirstColumn=False,
-                       showLastColumn=False, showRowStripes=True, showColumnStripes=True)
-tab.tableStyleInfo = style
+def new_table(ws: Worksheet, table_headers: list[str], table_rows: list[list | dict], table_name: str) -> None:
+    
+    ws.append(table_headers)
+
+    # add rows of data
+    for row in table_rows:
+        if isinstance(row, dict):
+            ws.append([row[h] for h in table_headers])
+        else:
+            ws.append(row)
+
+    table = Table(
+        displayName=table_name,
+        ref=f'A1:{xlscols[len(table_headers)-1]}{len(table_rows) + 1}'
+    )
+
+    # Add a default style with striped rows and banded columns
+    table.tableStyleInfo = TableStyleInfo(
+        name="TableStyleMedium9",
+        showFirstColumn=False,
+        showLastColumn=False,
+        showRowStripes=True,
+        showColumnStripes=True
+    )
+
+    ws.add_table(table)
 
 '''
-Table must be added using ws.add_table() method to avoid duplicate names.
-Using this method ensures table name is unque through out defined names and all other table name. 
-'''
-ws.add_table(tab)
-wb.save("table.xlsx")
+def new_wb_with_table(table_headers: list[str], table_rows: list[list | dict], table_name: str, sheet_name: str) -> None:
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = sheet_name
+
+    # add column headers
+    ws.append(table_headers)
+
+    # add rows of data
+    for row in table_rows:
+        if isinstance(row, dict):
+            ws.append([row[h] for h in table_headers])
+        else:
+            ws.append(row)
+
+    table = Table(
+        displayName=table_name,
+        ref=f'A1:{xlscols[len(table_headers)-1]}{len(table_rows) + 1}'
+    )
+
+    # Add a default style with striped rows and banded columns
+    table.tableStyleInfo = TableStyleInfo(
+        name="TableStyleMedium9",
+        showFirstColumn=False,
+        showLastColumn=False,
+        showRowStripes=True,
+        showColumnStripes=True
+    )
+
+    ws.add_table(table)
+
+    return wb'''
+
+
+if __name__ == '__main__':
+    filename = './table_test.xlsx'
+    '''data = [
+        {"Fruit": 'Apples', "2011": 10000, "2012": 5000, "2013": 8000, "2014": 6000},
+        {"Fruit": 'Pears', "2011": 2000, "2012": 3000, "2013": 4000, "2014": 5000},
+        {"Fruit": 'Bananas', "2011": 6000, "2012": 6000, "2013": 6500, "2014": 6000},
+        {"Fruit": 'Oranges', "2011": 500, "2012": 300, "2013": 200, "2014": 700000},
+    ]
+    head = ["Fruit", "2011", "2012", "2013", "2014"]
+    wb = new_wb_with_table(head, data, 'MY_TABLE', 'MY_SHEET')
+    wb.save(filename)'''
+    wb = load_workbook(filename=filename)
+    delete_table(wb, 'MY_TABLE')
+    wb.save(filename)
