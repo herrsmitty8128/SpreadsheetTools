@@ -1,0 +1,49 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+		{
+            "label": "Format python files",
+            "type": "shell",
+            "command": "autopep8",
+            "args":[
+                "--in-place",
+                "--max-line-length",
+                "250",
+                "--aggressive",
+                "--aggressive",
+                "SpreadsheetTools.py"],
+            "group": {
+				"kind": "build",
+				"isDefault": true
+			},
+            "presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": true,
+				"panel": "shared",
+				"showReuseMessage": true,
+				"clear": true
+			}
+        },
+        {
+            "label": "Run the app",
+            "type": "shell",
+            "command": "${command:python.interpreterPath}",
+            "args":["SpreadsheetTools.py"],
+            "group": {
+				"kind": "build",
+				"isDefault": true
+			},
+            "presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": true,
+				"panel": "shared",
+				"showReuseMessage": true,
+				"clear": true
+			}
+        }
+    ]
+}
