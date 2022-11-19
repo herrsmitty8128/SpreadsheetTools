@@ -51,9 +51,11 @@ def new_table(ws: Worksheet, table_headers: list[str], table_rows: list[list | d
     ws.add_table(table)
 
 
-def clear_sheet(ws: Worksheet) -> None:
-    
-    pass
+def delete_all_rows(ws: Worksheet) -> None:
+    '''
+    Deletes all the rows in a worksheet.
+    '''
+    ws.delete_rows(1,ws.max_row)
 
 
 '''
@@ -104,5 +106,6 @@ if __name__ == '__main__':
     wb = new_wb_with_table(head, data, 'MY_TABLE', 'MY_SHEET')
     wb.save(filename)'''
     wb = load_workbook(filename=filename)
-    delete_table(wb, 'MY_TABLE')
+    ws = wb['MY_SHEET']
+    delete_all_rows(ws)
     wb.save(filename)
