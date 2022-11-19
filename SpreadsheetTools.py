@@ -50,6 +50,12 @@ def new_table(ws: Worksheet, table_headers: list[str], table_rows: list[list | d
 
     ws.add_table(table)
 
+
+def clear_sheet(ws: Worksheet) -> None:
+    
+    pass
+
+
 '''
 def new_wb_with_table(table_headers: list[str], table_rows: list[list | dict], table_name: str, sheet_name: str) -> None:
 
