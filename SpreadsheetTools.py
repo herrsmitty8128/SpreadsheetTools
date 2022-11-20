@@ -5,13 +5,11 @@ from openpyxl.worksheet.table import Table, TableStyleInfo
 from openpyxl import load_workbook
 
 
-xlscols = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
-for i in range(26):
-    for j in range(26):
-        xlscols.append(xlscols[i] + xlscols[j])
-
-
 def delete_table(workbook: Workbook, table_name: str) -> Worksheet:
+    '''
+    Deletes an existing table from a workbook and returns the
+    worksheet that previously contained the table.
+    '''
     for ws in workbook.worksheets:
         for table in ws.tables.values():
             if table.name == table_name:
@@ -24,7 +22,7 @@ def delete_table(workbook: Workbook, table_name: str) -> Worksheet:
 
 
 def new_table(ws: Worksheet, table_headers: list[str], table_rows: list[list | dict], table_name: str) -> None:
-    
+
     ws.append(table_headers)
 
     # add rows of data
@@ -33,6 +31,11 @@ def new_table(ws: Worksheet, table_headers: list[str], table_rows: list[list | d
             ws.append([row[h] for h in table_headers])
         else:
             ws.append(row)
+    
+    xlscols = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+    for i in range(26):
+        for j in range(26):
+            xlscols.append(xlscols[i] + xlscols[j])
 
     table = Table(
         displayName=table_name,
@@ -58,40 +61,12 @@ def delete_all_rows(ws: Worksheet) -> None:
     ws.delete_rows(1,ws.max_row)
 
 
-'''
-def new_wb_with_table(table_headers: list[str], table_rows: list[list | dict], table_name: str, sheet_name: str) -> None:
-
+def new_wb_with_table(table_headers: list[str], table_rows: list[list | dict], table_name: str, sheet_name: str = 'Sheet1') -> None:
     wb = Workbook()
     ws = wb.active
     ws.title = sheet_name
-
-    # add column headers
-    ws.append(table_headers)
-
-    # add rows of data
-    for row in table_rows:
-        if isinstance(row, dict):
-            ws.append([row[h] for h in table_headers])
-        else:
-            ws.append(row)
-
-    table = Table(
-        displayName=table_name,
-        ref=f'A1:{xlscols[len(table_headers)-1]}{len(table_rows) + 1}'
-    )
-
-    # Add a default style with striped rows and banded columns
-    table.tableStyleInfo = TableStyleInfo(
-        name="TableStyleMedium9",
-        showFirstColumn=False,
-        showLastColumn=False,
-        showRowStripes=True,
-        showColumnStripes=True
-    )
-
-    ws.add_table(table)
-
-    return wb'''
+    new_table(ws, table_headers, table_rows, table_name)
+    return wb
 
 
 if __name__ == '__main__':
