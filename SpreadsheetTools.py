@@ -61,11 +61,37 @@ def delete_all_rows(ws: Worksheet) -> None:
     ws.delete_rows(1,ws.max_row)
 
 
-def new_wb_with_table(table_headers: list[str], table_rows: list[list | dict], table_name: str, sheet_name: str = 'Sheet1') -> None:
+def new_wb_with_table(table_headers: list[str], table_rows: list[list | dict], table_name: str, sheet_name: str = 'Sheet1') -> Workbook:
     wb = Workbook()
     ws = wb.active
     ws.title = sheet_name
     new_table(ws, table_headers, table_rows, table_name)
+    return wb
+
+
+def new_wb_with_tables(descriptors: list[dict]) -> Workbook:
+    '''
+    The descriptors param is a list of dicts that should look like this:
+    [
+        {
+            table_headers: list[str],
+            table_rows: list[list | dict],
+            table_name: str,
+            sheet_name: str = 'Sheet1'
+        },
+        {
+            table_headers: list[str],
+            table_rows: list[list | dict],
+            table_name: str,
+            sheet_name: str = 'Sheet1'
+        }
+    ]
+    '''
+    wb = Workbook()
+    active_sheet_name = wb.active.title
+    for d in descriptors:
+        new_table(wb.create_sheet(d['sheet_name']), d['table_headers'], d['table_rows'], d['table_name'])
+    del wb[active_sheet_name]
     return wb
 
 
@@ -80,7 +106,38 @@ if __name__ == '__main__':
     head = ["Fruit", "2011", "2012", "2013", "2014"]
     wb = new_wb_with_table(head, data, 'MY_TABLE', 'MY_SHEET')
     wb.save(filename)'''
+
+    '''
     wb = load_workbook(filename=filename)
     ws = wb['MY_SHEET']
     delete_all_rows(ws)
+    wb.save(filename)
+    '''
+
+    data = [
+        {
+            'table_headers': ["Fruit", "2011", "2012", "2013", "2014"],
+            'table_rows': [
+                {"Fruit": 'Apples', "2011": 10000, "2012": 5000, "2013": 8000, "2014": 6000},
+                {"Fruit": 'Pears', "2011": 2000, "2012": 3000, "2013": 4000, "2014": 5000},
+                {"Fruit": 'Bananas', "2011": 6000, "2012": 6000, "2013": 6500, "2014": 6000},
+                {"Fruit": 'Oranges', "2011": 500, "2012": 300, "2013": 200, "2014": 700000}
+            ],
+            'sheet_name': 'first sheet',
+            'table_name': 'first_table'
+        },
+        {
+            'table_headers': ["Fruit", "2011", "2012", "2013", "2014"],
+            'table_rows': [
+                {"Fruit": 'Apples', "2011": 10000, "2012": 5000, "2013": 8000, "2014": 6000},
+                {"Fruit": 'Pears', "2011": 2000, "2012": 3000, "2013": 4000, "2014": 5000},
+                {"Fruit": 'Bananas', "2011": 6000, "2012": 6000, "2013": 6500, "2014": 6000},
+                {"Fruit": 'Oranges', "2011": 500, "2012": 300, "2013": 200, "2014": 700000}
+            ],
+            'sheet_name': 'second sheet',
+            'table_name': 'second_table'
+        }
+    ]
+
+    wb = new_wb_with_tables(data)
     wb.save(filename)
