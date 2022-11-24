@@ -28,7 +28,7 @@ def delete_table(workbook: Workbook, table_name: str) -> Worksheet:
     return None
 
 
-def new_table(ws: Worksheet, table_headers: list[str], table_rows: list[list | dict], table_name: str) -> None:
+def new_table(ws: Worksheet, table_headers: list[str], table_rows: list[dict], table_name: str) -> None:
 
     # Be sure to first delete the existing rows if you want the table to start on row 1
     delete_all_rows(ws)
@@ -64,7 +64,7 @@ def new_table(ws: Worksheet, table_headers: list[str], table_rows: list[list | d
     ws.add_table(table)
 
 
-def new_wb_with_table(table_headers: list[str], table_rows: list[list | dict], table_name: str, sheet_name: str = 'Sheet1') -> Workbook:
+def new_wb_with_table(filename: str, table_headers: list[str], table_rows: list[dict], table_name: str, sheet_name: str = 'Sheet1') -> Workbook:
     '''
     Creates and returns a new workbook containing a new worksheet that contains the new table.
     '''
@@ -72,10 +72,10 @@ def new_wb_with_table(table_headers: list[str], table_rows: list[list | dict], t
     ws = wb.active
     ws.title = sheet_name
     new_table(ws, table_headers, table_rows, table_name)
-    return wb
+    wb.save(filename)
 
 
-def new_wb_with_tables(descriptors: list[dict]) -> Workbook:
+def new_wb_with_tables(filename: str, descriptors: list[dict]) -> Workbook:
     '''
     Creates and returns a new workbook containing new worksheets each containing a new table.
     The descriptors param is a list of dicts that should look like this:
@@ -99,10 +99,10 @@ def new_wb_with_tables(descriptors: list[dict]) -> Workbook:
     for d in descriptors:
         new_table(wb.create_sheet(d['sheet_name']), d['table_headers'], d['table_rows'], d['table_name'])
     del wb[active_sheet_name]
-    return wb
+    wb.save(filename)
 
 
-def replace_table_in_existing_wb(filename: str, table_headers: list[str], table_rows: list[list | dict], table_name: str) -> None:
+def replace_table_in_existing_wb(filename: str, table_headers: list[str], table_rows: list[dict], table_name: str) -> None:
     '''
     Opens a workbook file, deletes the current table, then replaces it with the new table and saves the file.
     '''
